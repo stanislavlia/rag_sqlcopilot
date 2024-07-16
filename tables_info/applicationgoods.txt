@@ -1,0 +1,20 @@
+CREATE TABLE copilot2.applicationgoods (
+	_id TEXT, 
+	code TEXT, 
+	volume DOUBLE PRECISION, 
+	weight DOUBLE PRECISION, 
+	quantity BIGINT, number of goods to deliver
+	price DOUBLE PRECISION, 
+	deliveredquantity DOUBLE PRECISION, 
+	name TEXT, 
+	child_id TEXT, 
+	appid TEXT, 
+	companyid TEXT,
+	timestamps_createdat TEXT, 
+	pg_updated_at TEXT, 
+	pg_created_at TEXT, 
+	pg_id BIGINT, 
+	casecoefficient DOUBLE PRECISION, 
+	pg_deleted_at TEXT, 
+	timestamps_updatedat TEXT
+)

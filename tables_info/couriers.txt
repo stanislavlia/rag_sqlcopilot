@@ -1,0 +1,18 @@
+CREATE TABLE copilot2.couriers (
+    _id TEXT,
+    email TEXT,
+    companyid TEXT,
+    phone BIGINT,
+    createdat TEXT,
+    transportid TEXT,
+    salary BIGINT,
+    fullname TEXT,
+    userid TEXT,
+    customid BIGINT,
+    status TEXT,
+    pg_deleted_at DOUBLE PRECISION, -- deletion time (if deleted)
+    is_rebox BOOLEAN,
+    is_approved BOOLEAN,
+    timestamps_createdat DOUBLE PRECISION, -- time when the courier was added to the database
+    timestamps_updatedat TEXT -- last update time
+);

@@ -1,0 +1,17 @@
+CREATE TABLE copilot2.clients (
+    _id TEXT,
+    name TEXT,
+    phone DOUBLE PRECISION,
+    createduserid TEXT,
+    createdat TEXT,
+    companyid TEXT,
+    email TEXT,
+    description TEXT,
+    status DOUBLE PRECISION,
+    externalid DOUBLE PRECISION,
+    pg_deleted_at DOUBLE PRECISION, -- deletion time (if deleted)
+    addresses_0_coords_lat DOUBLE PRECISION,
+    addresses_0_coords_long DOUBLE PRECISION,
+    timestamps_createdat TEXT, -- time when the client was added to the database
+    timestamps_updatedat TEXT  -- last update time
+);

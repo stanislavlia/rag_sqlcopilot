@@ -1,0 +1,58 @@
+CREATE TABLE copilot2.applications (
+	_id TEXT, 
+	addressfromcoords_lat DOUBLE PRECISION, pick-up latitude 
+	addressfromcoords_long DOUBLE PRECISION, pick-up longitude
+	addressfromdetails DOUBLE PRECISION, pick-up address details
+	addresstoaddress TEXT, delivery address
+	addresstocoords_lat DOUBLE PRECISION, delivery latitude
+	addresstocoords_long DOUBLE PRECISION, delivery longitude
+	addresstodetails DOUBLE PRECISION, delivery address details
+	apptype TEXT,  type of an application: delivery or pickUp
+	client_id TEXT, 
+	courier_id TEXT, 
+	courierwentdate TEXT, 
+	createdusername TEXT, 
+	deliveryprice BIGINT, 
+	details DOUBLE PRECISION, 
+	externalid TEXT, 
+	factdeliverydate TEXT, actual delivery time.
+	finishedinarea BOOLEAN, 
+	generalprice DOUBLE PRECISION, price of an application 
+	goodscount BIGINT, 
+	typeofdeliver DOUBLE PRECISION, 
+	waitinginarea BOOLEAN, 
+	loadtime BIGINT, 
+	plandeliveryperiodtartdate TEXT, planned start delivery time.
+	plandeliveryperiod_enddate TEXT, planned end delivery time
+	pricetype TEXT, 
+	priority BIGINT, 
+	rejectcount BIGINT, number of applications for return/Canceled goods
+	requiretransportskill TEXT, 
+	routeid TEXT, 
+	sender_fullname TEXT, 
+	sender_phone TEXT, 
+	statusgroup TEXT, status of application, has three values: new, finished and inprocess (users might call them 'active').
+	timestamps_createdat TEXT, time, when app was created
+	timestamps_updatedat TEXT, time, when app was last updated
+	updated TEXT, 
+	volume DOUBLE PRECISION, 
+	weight DOUBLE PRECISION, 
+	waittime BIGINT, 
+	waitingstarted TEXT, 
+	waitingended TEXT, 
+	companyid TEXT, 
+	additionaldetails TEXT, 
+	customgoodsprice BIGINT, 
+	goodsprice DOUBLE PRECISION, 
+	haswrongaddress BOOLEAN, 
+	index BIGINT, 
+	late DOUBLE PRECISION, 
+	statusname TEXT, 
+	distance_dbl DOUBLE PRECISION, 
+	geom DOUBLE PRECISION, 
+	addressfrom_address TEXT, 
+	courier_note DOUBLE PRECISION, commentary left by courier 
+	pg_deleted_at DOUBLE PRECISION, application deletion time (if deleted)
+	distancealgoverse DOUBLE PRECISION, 
+	plan_options_service_app_type TEXT
+)

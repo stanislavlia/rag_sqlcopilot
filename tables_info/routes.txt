@@ -1,0 +1,21 @@
+CREATE TABLE copilot2.routes (
+    _id VARCHAR,
+    child_id VARCHAR,
+    name VARCHAR,
+    appscount VARCHAR, -- number of applications within that route
+    createdat TIMESTAMP WITH TIME ZONE,
+    startdate TIMESTAMP WITH TIME ZONE,
+    companyid VARCHAR,
+    depotloadingtime VARCHAR,
+    depotloadingcount VARCHAR,
+    status VARCHAR,
+    distance VARCHAR, -- distance of route in meters
+    time VARCHAR,
+    enddate TIMESTAMP WITH TIME ZONE,
+    pg_created_at TIMESTAMP WITH TIME ZONE,
+    pg_updated_at TIMESTAMP WITH TIME ZONE,
+    pg_id INTEGER,
+    pg_deleted_at TIMESTAMP WITH TIME ZONE,
+    timestamps_createdat TIMESTAMP WITH TIME ZONE,
+    timestamps_updatedat TIMESTAMP WITH TIME ZONE
+);

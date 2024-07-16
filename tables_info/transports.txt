@@ -1,0 +1,16 @@
+CREATE TABLE copilot2.transports (
+    _id TEXT,
+    cartype TEXT,
+    ishired DOUBLE PRECISION, -- true or false
+    brand TEXT,
+    statenumber TEXT,
+    maxweight BIGINT, -- lifting capacity
+    maxvolume DOUBLE PRECISION, -- volume capacity
+    costperdistance DOUBLE PRECISION, -- gasoline cost per km
+    companyid TEXT,
+    pallet DOUBLE PRECISION,
+    createduserid TEXT,
+    transportskill TEXT,
+    status DOUBLE PRECISION,
+    name DOUBLE PRECISION
+);

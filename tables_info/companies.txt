@@ -1,0 +1,16 @@
+CREATE TABLE copilot2.companies (
+    _id VARCHAR NOT NULL,
+    name VARCHAR, -- name of branch/department/филиал
+    createdat TIMESTAMP WITHOUT TIME ZONE,
+    lat DOUBLE PRECISION,
+    lon DOUBLE PRECISION,
+    pg_updated_at TIMESTAMP WITH TIME ZONE,
+    pg_created_at TIMESTAMP WITH TIME ZONE,
+    email VARCHAR(50),
+    bigroup VARCHAR(100),
+    pg_deleted_at TIMESTAMP WITH TIME ZONE,
+    timestamps_createdat TIMESTAMP WITH TIME ZONE,
+    timestamps_updatedat TIMESTAMP WITH TIME ZONE,
+    time_zone_offset INTEGER,
+    time_zone_name VARCHAR(100)
+);
