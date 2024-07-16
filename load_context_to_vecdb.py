@@ -80,3 +80,16 @@ if __name__ == "__main__":
                           persist_directory=None)
     
     #load context to collections
+
+    ddl_vecstore.add_texts(texts=DDL_TABLES_SQL_QUERIES)
+    sqlexamples_vecstore.add_texts(texts=[add_comment_doc(doc["question"], doc["sql"]) for doc in TRAIN_SQL_EXAMPLES])
+    doc_vecstore.add_texts(texts=CONTEXT_DOCS)
+
+    print("All done sucessfuly")
+
+    print(sqlexamples_vecstore.similarity_search("What are the most efficient drivers according to KPI?", k=3))
+
+    
+
+
+    
