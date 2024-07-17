@@ -61,9 +61,6 @@ class RetrievalManager():
 
         self.graph_workflow = self.__build_graph()
     
-    def __build_graph(self):
-        pass
-
     
     def _retrieve_similar_ddl(self, state : RetrievalGraphState):
         
@@ -103,3 +100,27 @@ class RetrievalManager():
 
         return new_state
     
+
+    def __build_graph(self):
+        
+        workflow = StateGraph(RetrievalGraphState)
+
+        workflow.add_node("retrieve_ddl", self._retrieve_similar_ddl)
+        workflow.add_node("retrieve_sql_examples", self._retrieve_similar_sql)
+        workflow.add_node("retrieve_documentation", self._retrieve_similar_documentation)
+
+        workflow.set_entry_point("retrieve_ddl")
+        workflow.add_edge("retrieve_ddl", "retrieve_sql_examples")
+        workflow.add_edge("retrieve_sql_examples", "retrieve_documentation")
+        workflow.add_edge("retrieve_documentation", END)
+
+        graph = workflow.compile()
+        logging.info("[RETRIEVAL] Graph sucessfully compiled")
+        return graph
+    
+    def get_runnable(self) -> RunnableSequence:
+
+        return self.graph_workflow
+
+
+

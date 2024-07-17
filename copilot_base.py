@@ -2,6 +2,7 @@ from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 import logging
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
+from retrieval_api import RetrievalManager
 import chromadb
 import os
 from dotenv import load_dotenv
@@ -53,6 +54,16 @@ doc_vecstore = Chroma(client=chromadb_client,
                           collection_name="docs",
                           embedding_function=OPENAI_EMBEDDING_FUNC,
                           persist_directory=None)
+
+
+retrieval_manager = RetrievalManager(ddl_collection=ddl_vecstore,
+                                     sql_examples_collection=sqlexamples_vecstore,
+                                     doc_collection=doc_vecstore).get_runnable()
+
+
+# from pprint import pprint
+
+# pprint(retrieval_manager.invoke({"question" : "How many drivers do we have in Almaty branch?"}))
 
 
  
