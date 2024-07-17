@@ -7,6 +7,8 @@ from postgres_executor_graph import PostgresExecutor
 import chromadb
 import os
 from dotenv import load_dotenv
+from pprint import pprint
+
 load_dotenv()
 
 logging.basicConfig(
@@ -70,7 +72,10 @@ postgres_executor = PostgresExecutor(pg_database=PG_DATABASE,
                                      pg_port=PG_PORT,
                                      pg_schema=PG_SCHEMA)
 
-# from pprint import pprint
+
+pprint(postgres_executor._execute_query({"sql_query" : "SELECT _id, fullname FROM copilot2.couriers LIMIT 12"}))
+
+
 
 # pprint(retrieval_manager.invoke({"question" : "Who is the most efficient driver according to KPI?"}))
 

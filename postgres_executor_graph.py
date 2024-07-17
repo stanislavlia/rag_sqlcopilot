@@ -60,7 +60,9 @@ class PostgresExecutor():
     
     def sql_result_to_markdown(self, sql_result, column_names):
 
-        df = pd.DataFrame(sql_result, column_names)
+        df = pd.DataFrame(sql_result)
+        df.columns = column_names
+        
         return df.to_markdown()
 
 
@@ -73,7 +75,7 @@ class PostgresExecutor():
         
         try:
             cursor = self.db_connection.cursor()
-            cursor.execute()
+            cursor.execute(sql_query)
             self.db_connection.commit()
 
             sql_result = cursor.fetchmany(size=self.limit_rows)
