@@ -45,15 +45,61 @@ class RetrievalManager():
     def __init__(self, 
                  ddl_collection : VectorStore,
                  sql_examples_collection : VectorStore,
-                 doc_collection : VectorStore):
+                 doc_collection : VectorStore,
+                 k_ddl=4,
+                 k_sql=3,
+                 k_doc=1):
         
         
         self.ddl_collection = ddl_collection
         self.sql_examples_collection = sql_examples_collection
         self.doc_collection = doc_collection
+        
+        self.k_ddl = k_ddl
+        self.k_sql = k_sql
+        self.k_doc = k_doc
 
         self.graph_workflow = self.__build_graph()
     
     def __build_graph(self):
         pass
 
+    
+    def _retrieve_similar_ddl(self, state : RetrievalGraphState):
+        
+        question = state['question']
+
+        retrieved_ddls = self.ddl_collection.similarity_search(query=question,
+                                                               k=self.k_ddl)
+        
+        new_state = state
+        new_state['relevant_ddl'] = retrieved_ddls
+
+        logging.info(f"[RETRIEVAL] Question: {question}; Retrieved ddls sucessfully")
+
+        return new_state
+    
+    def _retrieve_similar_sql(self, state : RetrievalGraphState):
+        question = state['question']
+
+        retrieved_sqls = self.sql_examples_collection.max_marginal_relevance_search(query=question,
+                                                                                   k=self.k_sql)
+        
+        new_state = state
+        new_state['relevant_sql_examples'] = retrieved_sqls
+        logging.info(f"[RETRIEVAL] Question: {question}; Retrieved SQLs sucessfully")
+
+        return new_state
+    
+    def _retrieve_similar_documentation(self, state : RetrievalGraphState):
+        question = state["question"]
+
+        retrieved_documentation = self.doc_collection.similarity_search(query=question,
+                                                                        k=self.k_doc)
+        
+        new_state = state
+        new_state['relevant_documentation'] = retrieved_documentation
+        logging.info(f"[RETRIEVAL] Question: {question}; Retrieved Documentation sucessfully")
+
+        return new_state
+    
