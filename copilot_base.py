@@ -3,6 +3,7 @@ import logging
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from retrieval_graph import RetrievalManager
+from postgres_executor_graph import PostgresExecutor
 import chromadb
 import os
 from dotenv import load_dotenv
@@ -60,6 +61,14 @@ retrieval_manager = RetrievalManager(ddl_collection=ddl_vecstore,
                                      sql_examples_collection=sqlexamples_vecstore,
                                      doc_collection=doc_vecstore).get_runnable()
 
+
+
+postgres_executor = PostgresExecutor(pg_database=PG_DATABASE,
+                                     pg_user=PG_USER,
+                                     pg_password=PG_PASSWORD,
+                                     pg_host=PG_HOST,
+                                     pg_port=PG_PORT,
+                                     pg_schema=PG_SCHEMA)
 
 # from pprint import pprint
 
