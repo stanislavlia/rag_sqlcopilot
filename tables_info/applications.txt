@@ -1,3 +1,7 @@
+-- This table is probably the most important one as it captures all needed 
+-- information about completed orders/applications, about driver's efficiency
+-- and the revenue of company
+
 CREATE TABLE copilot2.applications (
 	_id TEXT, 
 	addressfromcoords_lat DOUBLE PRECISION, pick-up latitude 
