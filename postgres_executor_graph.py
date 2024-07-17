@@ -147,7 +147,7 @@ class PostgresExecutor():
         workflow.add_edge("execute_query", END)
 
         graph = workflow.compile().with_config({"run_name": "PostgreSQL Executor"})
-
+        logging.info(f"[PostgresExecutor] graph compiled successfully")
         return graph
 
     def get_runnable(self) -> RunnableSequence:

@@ -70,10 +70,13 @@ postgres_executor = PostgresExecutor(pg_database=PG_DATABASE,
                                      pg_password=PG_PASSWORD,
                                      pg_host=PG_HOST,
                                      pg_port=PG_PORT,
-                                     pg_schema=PG_SCHEMA)
+                                     pg_schema=PG_SCHEMA).get_runnable()
 
 
-pprint(postgres_executor._execute_query({"sql_query" : "SELECT _id, fullname FROM copilot2.couriers LIMIT 12"}))
+
+
+
+postgres_executor.invoke({"sql_query" : "DELETE _id, fullname FROM copilot2.couriers LIMIT 102"})
 
 
 
