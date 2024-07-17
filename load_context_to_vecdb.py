@@ -12,8 +12,13 @@ DUP_TRESHOLD=0.99
 
 def check_if_duplicate(collection, doc_content):
 
-    most_similar_doc = collection.similarity_search_with_relevance_scores(query=doc_content, k=1)[0]
-    similarity_score = most_similar_doc[1]
+    most_similar_doc = collection.similarity_search_with_relevance_scores(query=doc_content, k=1)
+
+    if (len(most_similar_doc) == 0):
+        logging.info(f"Collection {collection._collection.name.upper()} IS EMPTY;  NEW DOCUMENT")
+        return False
+        
+    similarity_score = most_similar_doc[0][1]
 
     if (similarity_score >= DUP_TRESHOLD):
         logging.warning(f"Collection {collection._collection.name.upper()};  Duplicate check for doc '{doc_content[:30]}...'; similarity score = {similarity_score}; DUPLICATE")
@@ -70,7 +75,7 @@ TRAIN_SQL_FILES = [
 
 DDL_TABLES_FILES = [os.path.join(CONTEXT_DIR_PATH, filename) for filename in DDL_TABLES_FILES]    
 DDL_TABLES_SQL_QUERIES = [read_file_content(path) for path in DDL_TABLES_FILES]
-CONTEXT_DOCS = [read_file_content(path) for path in DDL_TABLES_FILES]
+CONTEXT_DOCS = [read_file_content(path) for path in DOCS_FILES]
 
 TRAIN_SQL_EXAMPLES = [{"question" : example["question"],
                        "sql" : read_file_content(example["path"])} for example in TRAIN_SQL_FILES]
@@ -121,8 +126,10 @@ if __name__ == "__main__":
     if (filtered_documentation):
         doc_vecstore.add_texts(texts=filtered_documentation)
 
-    print("All done sucessfuly")
-    print(filtered_ddl)
+    logging.info(f"{len(filtered_ddl)} of new docs loaded to DDL collection")
+    logging.info(f"{len(filtered_sql_exmpls)} of new docs loaded to sql examples collection")
+    logging.info(f"{len(filtered_documentation)} of new docs loaded to documentation collection")
+    
 
 
     # question = "Who are the most efficient couriers according to KPI?"
