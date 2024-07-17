@@ -2,7 +2,7 @@ from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 import logging
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
-from retrieval_api import RetrievalManager
+from retrieval_graph import RetrievalManager
 import chromadb
 import os
 from dotenv import load_dotenv
@@ -63,7 +63,7 @@ retrieval_manager = RetrievalManager(ddl_collection=ddl_vecstore,
 
 # from pprint import pprint
 
-# pprint(retrieval_manager.invoke({"question" : "How many drivers do we have in Almaty branch?"}))
+# pprint(retrieval_manager.invoke({"question" : "Who is the most efficient driver according to KPI?"}))
 
 
  

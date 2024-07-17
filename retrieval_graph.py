@@ -1,9 +1,9 @@
 from typing_extensions import TypedDict, List, Optional, Required
 from langchain_core.runnables.base import RunnableSequence
 from langgraph.graph import END, StateGraph
-from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_community.vectorstores import VectorStore
 from langchain_core.documents import Document
+
 import logging
 
 DUP_TRESHOLD=0.99
@@ -28,7 +28,6 @@ def check_if_duplicate(collection, doc_content):
 
 
 ##=======RETRIEVAL GRAPH STATE===============
-
 class RetrievalGraphState(TypedDict):
     """Represents the state of Retrieval workflow"""
     question: Required[str]
@@ -59,6 +58,8 @@ class RetrievalManager():
         self.k_sql = k_sql
         self.k_doc = k_doc
 
+
+        
         self.graph_workflow = self.__build_graph()
     
     
@@ -114,7 +115,8 @@ class RetrievalManager():
         workflow.add_edge("retrieve_sql_examples", "retrieve_documentation")
         workflow.add_edge("retrieve_documentation", END)
 
-        graph = workflow.compile()
+        graph = workflow.compile().with_config({"run_name": "Retrieval Manager"})
+
         logging.info("[RETRIEVAL] Graph sucessfully compiled")
         return graph
     

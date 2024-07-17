@@ -6,10 +6,7 @@ from langchain.evaluation import EmbeddingDistance
 from langchain.evaluation import load_evaluator
 from copilot_base import ddl_vecstore, sqlexamples_vecstore, doc_vecstore
 import logging
-from retrieval_api import check_if_duplicate
-
-
-
+from retrieval_graph import check_if_duplicate
 
 
 
