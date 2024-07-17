@@ -1,5 +1,4 @@
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
-from langchain_core.output_parsers import StrOutputParser
 import logging
 from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
@@ -27,7 +26,6 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 PG_URI = f"postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DATABASE}"
 MODEL_NAME="gpt-4o"
 MEMORY_DIR=os.getenv("MEMORY_DIR", default="/memory_dir")
-DUP_TRESHOLD=0.99
 CHROMA_DB_HOST="localhost"
 CHROMA_DB_PORT=8000
 OPENAI_EMBEDDING_FUNC = OpenAIEmbeddings(model="text-embedding-ada-002",
@@ -56,3 +54,5 @@ doc_vecstore = Chroma(client=chromadb_client,
                           embedding_function=OPENAI_EMBEDDING_FUNC,
                           persist_directory=None)
 
+
+ 
