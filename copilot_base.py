@@ -1,6 +1,9 @@
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_core.output_parsers import StrOutputParser
 import logging
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
+import chromadb
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -24,6 +27,32 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 PG_URI = f"postgresql://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DATABASE}"
 MODEL_NAME="gpt-4o"
 MEMORY_DIR=os.getenv("MEMORY_DIR", default="/memory_dir")
+DUP_TRESHOLD=0.99
+CHROMA_DB_HOST="localhost"
+CHROMA_DB_PORT=8000
+OPENAI_EMBEDDING_FUNC = OpenAIEmbeddings(model="text-embedding-ada-002",
+                                        api_key=OPENAI_API_KEY)
 
 
+#Connect to Chroma
+chromadb_client = chromadb.HttpClient(host=CHROMA_DB_HOST,
+                                          port=CHROMA_DB_PORT)
+
+logging.info("Connected to Chroma sucessfully")
+
+#Create collections
+ddl_vecstore = Chroma(client=chromadb_client,
+                          collection_name="ddl_statements",
+                          embedding_function=OPENAI_EMBEDDING_FUNC,
+                          persist_directory=None)
+    
+sqlexamples_vecstore = Chroma(client=chromadb_client,
+                          collection_name="sql_examples",
+                          embedding_function=OPENAI_EMBEDDING_FUNC,
+                          persist_directory=None)
+    
+doc_vecstore = Chroma(client=chromadb_client,
+                          collection_name="docs",
+                          embedding_function=OPENAI_EMBEDDING_FUNC,
+                          persist_directory=None)
 
