@@ -12,6 +12,7 @@ class SQLExecutorGraphState(TypedDict):
     sql_query : Required[str]
     sql_result : List
     sql_result_markdown : str
+    is_query_safe : bool
     any_errors : bool
     error_trace : str
 
@@ -38,6 +39,8 @@ class PostgresExecutor():
         self.limit_rows = limit_rows
 
         self.db_connection = self.__connect_to_db()
+
+        self.graph_workflow = self.__build_graph()
         
     def __connect_to_db(self):
         try:
@@ -62,12 +65,35 @@ class PostgresExecutor():
 
         df = pd.DataFrame(sql_result)
         df.columns = column_names
-        
+
         return df.to_markdown()
 
 
-    def _sanitize_query(self, state : SQLExecutorGraphState):
-        pass
+    def _sanitize_query(self, state: SQLExecutorGraphState):
+        unsafe_keywords = ['DROP', 'DELETE', 'ALTER', 'CREATE', 'INSERT', 'UPDATE']
+        sql_query = state["sql_query"].upper()
+
+        new_state = state
+
+        if any(keyword in sql_query for keyword in unsafe_keywords):
+            new_state["is_query_safe"] = False
+            new_state["any_errors"] = True
+            new_state["error_trace"] = "The query is unsafe and tries to ALTER database. READ-ONLY mode is only acceptable"
+            logging.warn(f"[PostgresExecutor] Detected UNSAFE query")
+
+            return state
+        else:
+            new_state["is_query_safe"] = True
+            new_state["any_errors"] = False
+            logging.info(f"[PostgresExecutor] query is SAFE")
+            
+            return state
+
+    def _decide_to_execute_query(self, state : SQLExecutorGraphState):
+        if state["is_query_safe"]:
+            return "execute_query"
+        return "END"
+        
 
     def _execute_query(self, state : SQLExecutorGraphState):
 
@@ -105,9 +131,28 @@ class PostgresExecutor():
                 cursor.close()
 
 
+    def __build_graph(self):
 
+        workflow = StateGraph(SQLExecutorGraphState)
 
+        workflow.add_node("sanitize_query", self._sanitize_query)
+        workflow.add_node("execute_query", self._execute_query)
 
+        workflow.set_entry_point("sanitize_query")
+        workflow.add_conditional_edges("sanitize_query",
+                                       self._decide_to_execute_query,
+                                       path_map={"execute_query" : "execute_query",
+                                                 "END" : END})
+        
+        workflow.add_edge("execute_query", END)
+
+        graph = workflow.compile().with_config({"run_name": "PostgreSQL Executor"})
+
+        return graph
+
+    def get_runnable(self) -> RunnableSequence:
+
+        return self.graph_workflow
 
     
     
