@@ -5,6 +5,7 @@ import chromadb
 from retrieval_api import CHROMA_DB_HOST, CHROMA_DB_PORT, OPENAI_EMBEDDING_FUNC
 from langchain.evaluation import EmbeddingDistance
 from langchain.evaluation import load_evaluator
+import logging
 
 DUP_TRESHOLD=0.99
 
@@ -15,21 +16,13 @@ def check_if_duplicate(collection, doc_content):
     similarity_score = most_similar_doc[1]
 
     if (similarity_score >= DUP_TRESHOLD):
-        print("duplicate!")
+        logging.warning(f"Collection {collection._collection.name.upper()};  Duplicate check for doc '{doc_content[:30]}...'; similarity score = {similarity_score}; DUPLICATE")
         return True
+    
+    logging.info(f"Duplicate check; similarity score = {similarity_score}; NEW DOCUMENT")
     return False
 
     
-
-
-
-    
-
-        
-
-
-
-
 def read_file_content(path):
     with open(path, "r") as file:
         content = file.read()
@@ -82,6 +75,7 @@ CONTEXT_DOCS = [read_file_content(path) for path in DDL_TABLES_FILES]
 TRAIN_SQL_EXAMPLES = [{"question" : example["question"],
                        "sql" : read_file_content(example["path"])} for example in TRAIN_SQL_FILES]
 
+TRAIN_SQL_EXAMPLES = [add_comment_doc(doc["question"], doc["sql"]) for doc in TRAIN_SQL_EXAMPLES]
 
 
 if __name__ == "__main__":
@@ -107,19 +101,28 @@ if __name__ == "__main__":
                           embedding_function=OPENAI_EMBEDDING_FUNC,
                           persist_directory=None)
     
+    
+    
 
-    examples = [add_comment_doc(doc["question"], doc["sql"]) for doc in TRAIN_SQL_EXAMPLES]
+    #load docs to collections
 
-    check_if_duplicate(sqlexamples_vecstore, examples[1])
+    filtered_ddl = [doc for doc in DDL_TABLES_SQL_QUERIES if not check_if_duplicate(ddl_vecstore, doc)]
+    filtered_sql_exmpls = [doc for doc in TRAIN_SQL_EXAMPLES if not check_if_duplicate(sqlexamples_vecstore, doc)]
+    filtered_documentation = [doc for doc in CONTEXT_DOCS if not check_if_duplicate(doc_vecstore, doc)]
+    
+
 
 
     #load context to collections
+    if (filtered_ddl):
+        ddl_vecstore.add_texts(texts=filtered_ddl)
+    if (filtered_sql_exmpls):
+        sqlexamples_vecstore.add_texts(texts=filtered_sql_exmpls)
+    if (filtered_documentation):
+        doc_vecstore.add_texts(texts=filtered_documentation)
 
-    # ddl_vecstore.add_texts(texts=DDL_TABLES_SQL_QUERIES)
-    # sqlexamples_vecstore.add_texts(texts=[add_comment_doc(doc["question"], doc["sql"]) for doc in TRAIN_SQL_EXAMPLES])
-    # doc_vecstore.add_texts(texts=CONTEXT_DOCS)
-
-    # print("All done sucessfuly")
+    print("All done sucessfuly")
+    print(filtered_ddl)
 
 
     # question = "Who are the most efficient couriers according to KPI?"
