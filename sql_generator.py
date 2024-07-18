@@ -85,7 +85,7 @@ class SQLGenerator():
             llm : ChatOpenAI,
             retry_if_error=True,
             retry_if_syntax=True,
-            max_retries=2,
+            max_retries=1,
             sql_promt=SQL_GENERATOR_PROMT,
             result_promt=RESULT_INTERPRETER_PROMT,
             ):
@@ -138,6 +138,14 @@ class SQLGenerator():
         return llm_response
 
 
+    def format_question_retry(self, question, generated_sql, trace):
+
+        updated_question = f"""Your goal was to answer this question using SQL: {question}
+                        and you produced the following SQL: {generated_sql}
+        Database returned the following traceback on error {trace}. Please, fix your SQL query"""
+
+        return updated_question
+    
     #================Nodes implementation=================
     def _retrieve_context(self, state : SQLGeneratorState):
 
@@ -200,7 +208,11 @@ class SQLGenerator():
             
             error_trace = new_state["postgres_executor_response"]["error_trace"]
             new_state["n_retries"] += 1
-            new_state["question"] = new_state["question"] + f"\nPrevious time your query produced the following error: {error_trace}\n. Fix it please"
+            new_state["question"] = self.format_question_retry(state["question"],
+                                                                state["generated_sql"],
+                                                                error_trace)
+
+            #new_state["question"] = new_state["question"] + f"\nPrevious time your query produced the following error: {error_trace}\n. Fix it please"
             logging.error(f"Detected error; Need to RETRY...")
 
         return new_state

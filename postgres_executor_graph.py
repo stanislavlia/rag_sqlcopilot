@@ -71,7 +71,7 @@ class PostgresExecutor():
 
 
     def _sanitize_query(self, state: SQLExecutorGraphState):
-        unsafe_keywords = ['DROP', 'DELETE', 'ALTER', 'CREATE', 'INSERT', 'UPDATE']
+        unsafe_keywords = ['DROP', 'DELETE', ' ALTER ', ' CREATE ', ' INSERT ', ' UPDATE ']
         sql_query = state["sql_query"].upper()
 
         new_state = state

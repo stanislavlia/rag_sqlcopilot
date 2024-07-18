@@ -87,7 +87,7 @@ sql_generator_agent = SQLGenerator(retrieval_agent=retrieval_manager,
                                    ).get_runnable()
 
 
-pprint(sql_generator_agent.invoke({"question" : "Сколько водителей со статусом онлайн работаю в филиале Шымкента?",
+pprint(sql_generator_agent.invoke({"question" : "Сколько водителей/курьеров начали работать в компании в этом году?",
                                    "session_id" : "232"}))
 
 
