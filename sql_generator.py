@@ -50,7 +50,8 @@ RESULT_INTERPRETER_PROMT = PromptTemplate.from_template("""
     
     And provided domain knowledge that you can utilize: {domain}
     
-    Make sure to explain what steps were done on a high level without technincal details.
+    Make sure to explain what steps were done on a high level without technincal details and
+    NEVER include SQL query into your response.
     Translate your answer in Russian.
                                                     
 """)
@@ -66,6 +67,9 @@ class SQLGeneratorState(TypedDict):
     n_retries : int
     syntax_correct : bool
     final_answer : str
+
+
+#TODO: include previous query when retrying
 
 
 
@@ -94,6 +98,7 @@ class SQLGenerator():
         self.retry_if_syntax = retry_if_syntax
         self.sql_promt = sql_promt
         self.result_promt = result_promt
+        self.n_retries = max_retries
 
 
         self.generator_chain = (self.sql_promt | self.llm | StrOutputParser())
@@ -220,6 +225,10 @@ class SQLGenerator():
              or (state["postgres_executor_response"]["any_errors"] == True)):
             new_state = state
             new_state["final_answer"] = "After several retries, some error still persists when trying to run SQL query.\n Sorry for inconvinience"
+
+            #clean them for better readability (they saved anyway)
+            new_state["postgres_executor_response"] = None
+            new_state["retrieval_response"] = None
             return new_state
         
         new_state = state
@@ -233,6 +242,10 @@ class SQLGenerator():
                                                     "sql_result_md" : state["postgres_executor_response"]["sql_result_markdown"]})
         
         new_state["final_answer"] = llm_answer
+        
+        #clean them for better readability
+        new_state["postgres_executor_response"] = None
+        new_state["retrieval_response"] = None
         return new_state
 
 

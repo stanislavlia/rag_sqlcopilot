@@ -17,6 +17,7 @@ class SQLExecutorGraphState(TypedDict):
     error_trace : str
 
 
+
 class PostgresExecutor():
     """Langraph workflow that executes provided SQL query on PostgreSQL"""
 
@@ -100,6 +101,7 @@ class PostgresExecutor():
         sql_query = state["sql_query"]
         
         try:
+            self.db_connection = self.__connect_to_db()
             cursor = self.db_connection.cursor()
             cursor.execute(sql_query)
             self.db_connection.commit()
