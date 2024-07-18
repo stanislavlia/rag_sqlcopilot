@@ -88,7 +88,7 @@ sql_generator_agent = SQLGenerator(retrieval_agent=retrieval_manager,
                                    ).get_runnable()
 
 if __name__ == "__main__":
-    pprint(sql_generator_agent.invoke({"question" : "Сколько водителей со статусом 'Online' работает в филиале города Алматы?",
+    pprint(sql_generator_agent.invoke({"question" : "Сколько водителей работает в филиале города Алматы?",
                                     "session_id" : "232"}))
 
 

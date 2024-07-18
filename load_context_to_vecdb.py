@@ -77,7 +77,16 @@ TRAIN_SQL_FILES = [
      "question" : "What are the top 3 most popular goods in Almaty branch?"},
     
     {"path" : "tables_info/top_goods_almaty.sql",
-     "question" : "What are the top 3 most profitable clients in Almaty branch?"}
+     "question" : "What are the top 3 most profitable clients in Almaty branch?"},
+    
+    {"path" : "tables_info/count_drivers1.sql",
+     "question" : "How many drivers are there in Bishkek branch?"},
+
+     {"path" : "tables_info/count_drivers_karaganda.sql",
+     "question" : "How many drivers are there in Karaganda branch?"},
+
+     {"path" : "tables_info/count_drivers2.sql",
+     "question" : "How many drivers are there in Шымкент branch?"},
 ]
 
 
@@ -93,10 +102,6 @@ TRAIN_SQL_EXAMPLES = [add_comment_doc(doc["question"], doc["sql"]) for doc in TR
 
 if __name__ == "__main__":
 
-    
-    
-    
-    
 
     #load docs to collections
 
