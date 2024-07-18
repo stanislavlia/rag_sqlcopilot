@@ -26,6 +26,7 @@ def add_comment_doc(doc_content, comment):
 
 CONTEXT_DIR_PATH = "tables_info/"
 SQL_EXAMPLES_DIR = "sql_examples/"
+DOMAIN_CONTEXT_DIR = "domain_context/"
 
 DDL_TABLES_FILES = [
     "applicationgoods.txt",
@@ -38,10 +39,7 @@ DDL_TABLES_FILES = [
     "transports.txt"
 ]
 
-DOCS_FILES = [
-    "tables_info/logistics_domain_promt_no_sql.txt",
-    "tables_info/logistics_domain_promt.txt"
-]
+DOCS_FILES = [os.path.join(DOMAIN_CONTEXT_DIR, file) for file in os.listdir(DOMAIN_CONTEXT_DIR)]
 
 TRAIN_SQL_FILES = os.listdir(SQL_EXAMPLES_DIR)
 

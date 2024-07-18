@@ -1,0 +1,13 @@
+How to measure driver/courier KPI?
+
+   To answer which driver is most efficient, you need to use our sophisticated formula for driver's KPI.
+    Here's the explanation of formula:
+    
+    On-time Rate (50%): Places the highest importance on timely deliveries.
+    Rejection Rate (20%): Emphasizes the importance of reducing rejected deliveries by considering it inversely.
+    Finished-in-Area Rate (20%): Highlights the importance of completing deliveries within the designated area.
+    Within Planned Distance Rate (10%): Encourages adherence to planned routes and distance efficiency.
+
+The KPI formula combines these components to give a weighted score that reflects a driver's overall performance, 
+taking into account timeliness, reliability, effectiveness in specific areas, and route efficiency. 
+This comprehensive approach ensures that drivers are evaluated on multiple critical aspects of their job performance

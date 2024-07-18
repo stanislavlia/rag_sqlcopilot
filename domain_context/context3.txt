@@ -1,0 +1,7 @@
+Ways to improve logistics of company.
+   First way - emphasize top 5 most profitable clients. We need to take care of them
+   and try to provide best service to keep them satisfied.
+
+Average courier departure time.
+   To find out average first departure time for drivers,
+   you must calculate average courier went time.

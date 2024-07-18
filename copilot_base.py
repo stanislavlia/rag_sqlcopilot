@@ -69,7 +69,10 @@ doc_vecstore = Chroma(client=chromadb_client,
 
 retrieval_manager = RetrievalManager(ddl_collection=ddl_vecstore,
                                      sql_examples_collection=sqlexamples_vecstore,
-                                     doc_collection=doc_vecstore).get_runnable()
+                                     doc_collection=doc_vecstore,
+                                     k_ddl=4,
+                                     k_sql=3,
+                                     k_doc=2).get_runnable()
 
 
 

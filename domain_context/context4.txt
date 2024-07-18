@@ -1,0 +1,23 @@
+All branches/departments. Все филиалы в нашей компании
+
+    List of branches (table companies, column - name):
+
+"RG BRANDS" (это главный филиал в г. Алматы)
+"Филиал RG BRANDS в г. Актау"
+"Филиал RG BRANDS в г. Актобе"
+"Филиал RG BRANDS в г. Атырау"
+"Филиал RG BRANDS в г. Бишкек"
+"Филиал RG BRANDS в г. Джалал-Абат"
+"Филиал RG BRANDS в г. Караганда"
+"Филиал RG BRANDS в г. Костанай"
+"Филиал RG BRANDS в г. Кызылорда"
+"Филиал RG BRANDS в г. Нур-Султан"
+"Филиал RG BRANDS в г. Оскемен"
+"Филиал RG BRANDS в г. Ош"
+"Филиал RG BRANDS в г. Павлодар"
+"Филиал RG BRANDS в г. Семей"
+"Филиал RG BRANDS в г. Талдыкурган"
+"Филиал RG BRANDS в г. Тараз"
+"Филиал RG BRANDS в г. Туркестан"
+"Филиал RG BRANDS в г. Шымкент"
+   
