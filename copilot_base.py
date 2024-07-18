@@ -81,6 +81,15 @@ postgres_executor = PostgresExecutor(pg_database=PG_DATABASE,
                                      pg_password=PG_PASSWORD,
                                      pg_host=PG_HOST,
                                      pg_port=PG_PORT,
+                                     pg_schema=PG_SCHEMA)
+
+
+
+postgres_executor = PostgresExecutor(pg_database=PG_DATABASE,
+                                     pg_user=PG_USER,
+                                     pg_password=PG_PASSWORD,
+                                     pg_host=PG_HOST,
+                                     pg_port=PG_PORT,
                                      pg_schema=PG_SCHEMA).get_runnable()
 
 
@@ -91,17 +100,11 @@ sql_generator_agent = SQLGenerator(retrieval_agent=retrieval_manager,
                                    ).get_runnable()
 
 if __name__ == "__main__":
-    pprint(sql_generator_agent.invoke({"question" : "Сколько водителей работает в каждом филиале нашей компании?",
+    pprint(sql_generator_agent.invoke({"question" : "Топ 10 самых прибыльных клиентов за 2024 год",
                                     "session_id" : "232"}))
 
 
 
-
-# postgres_executor.invoke({"sql_query" : "DELETE _id, fullname FROM copilot2.couriers LIMIT 102"})
-
-
-
-# pprint(retrieval_manager.invoke({"question" : "Who is the most efficient driver according to KPI?"}))
 
 
  

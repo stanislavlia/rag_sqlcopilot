@@ -4,6 +4,7 @@ from langgraph.graph import END, StateGraph
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 import logging
 import pandas as pd
+import sqlparse
 import psycopg2
 
 
@@ -69,14 +70,21 @@ class PostgresExecutor():
 
         return df.to_markdown()
 
+    def is_sql_valid(self, sql):
+        parsed = sqlparse.parse(sql)
+
+        for statement in parsed:
+            if statement.get_type() == 'SELECT':
+                return True
+
+        return False
 
     def _sanitize_query(self, state: SQLExecutorGraphState):
-        unsafe_keywords = ['DROP', 'DELETE', ' ALTER ', ' CREATE ', ' INSERT ', ' UPDATE ']
         sql_query = state["sql_query"].upper()
 
         new_state = state
 
-        if any(keyword in sql_query for keyword in unsafe_keywords):
+        if not self.is_sql_valid(sql_query):
             new_state["is_query_safe"] = False
             new_state["any_errors"] = True
             new_state["error_trace"] = "The query is unsafe and tries to ALTER database. READ-ONLY mode is only acceptable"
@@ -108,7 +116,10 @@ class PostgresExecutor():
 
             sql_result = cursor.fetchmany(size=self.limit_rows)
             column_names = [desc[0] for desc in cursor.description]
-            sql_result_markdown = self.sql_result_to_markdown(sql_result, column_names)
+            if (len(sql_result)):
+                sql_result_markdown = self.sql_result_to_markdown(sql_result, column_names)
+            else:
+                sql_result_markdown = "Empty"
 
             new_state = state
             new_state["any_errors"] = False
