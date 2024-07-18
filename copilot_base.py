@@ -4,6 +4,7 @@ from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from retrieval_graph import RetrievalManager
 from postgres_executor_graph import PostgresExecutor
+from langchain_openai import ChatOpenAI
 import chromadb
 import os
 from dotenv import load_dotenv
@@ -35,6 +36,12 @@ CHROMA_DB_PORT=8000
 OPENAI_EMBEDDING_FUNC = OpenAIEmbeddings(model="text-embedding-ada-002",
                                         api_key=OPENAI_API_KEY)
 
+llm = ChatOpenAI(model=MODEL_NAME,
+             temperature=0,
+             verbose=True,
+             openai_api_key=OPENAI_API_KEY,
+             max_tokens=3500
+             )
 
 #Connect to Chroma
 chromadb_client = chromadb.HttpClient(host=CHROMA_DB_HOST,

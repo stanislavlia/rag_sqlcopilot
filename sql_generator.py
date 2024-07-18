@@ -8,18 +8,23 @@ from copilot_base import OPENAI_API_KEY, MODEL_NAME
 import logging
 
 
-llm = ChatOpenAI(model=MODEL_NAME,
-             temperature=0,
-             verbose=True,
-             openai_api_key=OPENAI_API_KEY,
-             max_tokens=3500
-             )
+##=======SQL GENERATOR GRAPH STATE===============
+
+class SQLGeneratorState(TypedDict):
+    question : Required[str]
+    generated_sql : str
+    retrieval_response : dict
+    postgres_executor_response : dict
+    n_retries : int
+    syntax_correct : bool
+
 
 
 
 class SQLGenerator():
     """Agent responsible for generating SQL for provided question.
-       Takes Retrieval Manager to dynamically build promt for LLM."""
+       Takes Retrieval Manager to dynamically build promt for LLM.
+       Takes Postgres Executor to interact with DB."""
 
     def __init__(self,
             retrieval_agent : RunnableSequence,
