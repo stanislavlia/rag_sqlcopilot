@@ -4,7 +4,6 @@ from langgraph.graph import END, StateGraph
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
-from copilot_base import OPENAI_API_KEY, MODEL_NAME
 from datetime import datetime
 import pytz
 import logging
@@ -12,7 +11,7 @@ import re
 
 AMLATY_TZ = pytz.timezone('Asia/Almaty')
 
-SQL_GENERATOR_PROMT = PromptTemplate("""
+SQL_GENERATOR_PROMT = PromptTemplate(template="""
     Current timestamp is {timestamp}.
     
     You are an expert analyst that transforms bussines questions into
@@ -34,7 +33,7 @@ SQL_GENERATOR_PROMT = PromptTemplate("""
     Make sure to generate READ-ONLY queries and your response is only valid SQL query without any 
     additional comments.             
 
-""")
+""", input_variables=["timestamp", "question", "ddls", "sql_examples", "docs"])
 
 RESULT_INTERPRETER_PROMT = PromptTemplate.from_template("""
     Current timestamp is {timestamp}.
@@ -60,7 +59,7 @@ RESULT_INTERPRETER_PROMT = PromptTemplate.from_template("""
 ##=======SQL GENERATOR GRAPH STATE===============
 class SQLGeneratorState(TypedDict):
     question : Required[str]
-    session_id : Required[int] #need for memory
+    session_id : Required[str] #need for memory
     generated_sql : str
     retrieval_response : dict
     postgres_executor_response : dict
@@ -99,6 +98,8 @@ class SQLGenerator():
 
         self.generator_chain = (self.sql_promt | self.llm | StrOutputParser())
         self.interpret_chain = (self.result_promt | self.llm | StrOutputParser())
+        self.graph_workflow = self.__build_graph()
+
 
     def join_docs(self, documents):
 
@@ -195,7 +196,7 @@ class SQLGenerator():
             error_trace = new_state["postgres_executor_response"]["error_trace"]
             new_state["n_retries"] += 1
             new_state["question"] = new_state["question"] + f"\nPrevious time your query produced the following error: {error_trace}\n. Fix it please"
-            logging.error(f"Detected error; Need to RETRY...; n_retries={new_state["n_retries"]}")
+            logging.error(f"Detected error; Need to RETRY...")
 
         return new_state
         
@@ -228,7 +229,7 @@ class SQLGenerator():
         llm_answer = self.interpret_chain.invoke({"question" : state["question"],
                                                     "timestamp" : current_time,
                                                     "domain" : self.join_docs(state["retrieval_response"]["relevant_documentation"]),
-                                                    "sql_generated" : state["generated_sql"],
+                                                    "generated_sql" : state["generated_sql"],
                                                     "sql_result_md" : state["postgres_executor_response"]["sql_result_markdown"]})
         
         new_state["final_answer"] = llm_answer
@@ -244,7 +245,7 @@ class SQLGenerator():
         workflow.add_node("run_sql", self._run_sql)
         workflow.add_node("interpret", self._interpret_results)
 
-        workflow.set_entry_point("retrieve_context", self._retrieve_context)
+        workflow.set_entry_point("retrieve_context")
         workflow.add_edge("retrieve_context", "generate_sql")
         workflow.add_edge("generate_sql", "run_sql")
         workflow.add_conditional_edges("run_sql",
@@ -252,8 +253,14 @@ class SQLGenerator():
                                         path_map={"retry" : "generate_sql",
                                                   "finish" : "interpret"})
         workflow.add_edge("interpret", END)
-        
 
+        graph = workflow.compile().with_config({"run_name": "SQLCopilotAgent"})
+        logging.info(f"[SQLCOPILOT] graph compiled successfully")
+        return graph
+
+    def get_runnable(self) -> RunnableSequence:
+
+        return self.graph_workflow
 
 
 

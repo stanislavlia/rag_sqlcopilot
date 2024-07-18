@@ -5,6 +5,7 @@ from langchain_community.vectorstores import Chroma
 from retrieval_graph import RetrievalManager
 from postgres_executor_graph import PostgresExecutor
 from langchain_openai import ChatOpenAI
+from sql_generator import SQLGenerator
 import chromadb
 import os
 from dotenv import load_dotenv
@@ -80,7 +81,14 @@ postgres_executor = PostgresExecutor(pg_database=PG_DATABASE,
                                      pg_schema=PG_SCHEMA).get_runnable()
 
 
+sql_generator_agent = SQLGenerator(retrieval_agent=retrieval_manager,
+                                   postgres_executor=postgres_executor,
+                                   llm=llm,
+                                   ).get_runnable()
 
+
+pprint(sql_generator_agent.invoke({"question" : "Как много водителей работает в филиале города Актобе?",
+                                   "session_id" : "232"}))
 
 
 
