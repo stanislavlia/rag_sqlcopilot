@@ -76,7 +76,9 @@ postgres_executor = PostgresExecutor(pg_database=PG_DATABASE,
 
 
 
-postgres_executor.invoke({"sql_query" : "DELETE _id, fullname FROM copilot2.couriers LIMIT 102"})
+
+
+# postgres_executor.invoke({"sql_query" : "DELETE _id, fullname FROM copilot2.couriers LIMIT 102"})
 
 
 
