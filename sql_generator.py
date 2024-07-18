@@ -145,7 +145,7 @@ class SQLGenerator():
 
         return new_state
     
-    def _generate_context(self, state : SQLGeneratorState):
+    def _generate_sql(self, state : SQLGeneratorState):
 
         question = state["question"]
         retrieval_response = state["retrieval_response"]
@@ -235,9 +235,24 @@ class SQLGenerator():
         return new_state
 
 
-        
+    def __build_graph(self):
 
-    
+        workflow = StateGraph(SQLGeneratorState)
+
+        workflow.add_node("retrieve_context", self._retrieve_context)
+        workflow.add_node("generate_sql", self._generate_sql)
+        workflow.add_node("run_sql", self._run_sql)
+        workflow.add_node("interpret", self._interpret_results)
+
+        workflow.set_entry_point("retrieve_context", self._retrieve_context)
+        workflow.add_edge("retrieve_context", "generate_sql")
+        workflow.add_edge("generate_sql", "run_sql")
+        workflow.add_conditional_edges("run_sql",
+                                        self._decide_to_retry,
+                                        path_map={"retry" : "generate_sql",
+                                                  "finish" : "interpret"})
+        workflow.add_edge("interpret", END)
+        
 
 
 
