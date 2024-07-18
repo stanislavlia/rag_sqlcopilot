@@ -16,7 +16,7 @@ class SQLExecutorGraphState(TypedDict):
     any_errors : bool
     error_trace : str
 
-
+#TODO: Fix checking for READ-only access using vanna funciton
 
 class PostgresExecutor():
     """Langraph workflow that executes provided SQL query on PostgreSQL"""

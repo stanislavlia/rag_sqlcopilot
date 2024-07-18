@@ -84,11 +84,12 @@ postgres_executor = PostgresExecutor(pg_database=PG_DATABASE,
 sql_generator_agent = SQLGenerator(retrieval_agent=retrieval_manager,
                                    postgres_executor=postgres_executor,
                                    llm=llm,
+                                   max_retries=3
                                    ).get_runnable()
 
-
-pprint(sql_generator_agent.invoke({"question" : "Сколько водителей/курьеров начали работать в компании в этом году?",
-                                   "session_id" : "232"}))
+if __name__ == "__main__":
+    pprint(sql_generator_agent.invoke({"question" : "Сколько водителей со статусом 'Online' работает в филиале города Алматы?",
+                                    "session_id" : "232"}))
 
 
 

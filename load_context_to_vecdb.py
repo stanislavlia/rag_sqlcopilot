@@ -50,11 +50,36 @@ TRAIN_SQL_FILES = [
      "question" : "Who are the most efficient drivers/couriers according to our KPI?"},
     
     {"path" : "tables_info/list_branches.sql",
-     "question" : "What deparments do we have in our company?"},
-
+     "question" : "What departments do we have in our company?"},
+    
     {"path" : "tables_info/metrics_summary.sql",
-     "question" : "Give me the summary about All applications, Incoming applications, Finished applications and Canceled applications"}
+     "question" : "Give me the summary about All applications, Incoming applications, Finished applications and Canceled applications"},
+    
+    {"path" : "tables_info/all_drivers_online.sql",
+     "question" : "How many drivers/couriers do we have among all branches?"},
+    
+    {"path" : "tables_info/avg_depart_time.sql",
+     "question" : "What are the average departure time for all drivers in Almaty RG BRANDS branch?"},
+    
+    {"path" : "tables_info/completed_cases.sql",
+     "question" : "What is the application completion rate for all branches?"},
+    
+    {"path" : "tables_info/delivered_cases.sql",
+     "question" : "How many delivered cases/applications do we have for June in Almaty (RG BRANDS) branch?"},
+    
+    {"path" : "tables_info/drivers_almaty.sql",
+     "question" : "How many drivers do work in Almaty (RG BRANDS) branch?"},
+    
+    {"path" : "tables_info/relog_driver_example.sql",
+     "question" : "Which driver uses application Relog Driver without pressing 'Depart' button?"},
+    
+    {"path" : "tables_info/top_3_goods.sql",
+     "question" : "What are the top 3 most popular goods in Almaty branch?"},
+    
+    {"path" : "tables_info/top_goods_almaty.sql",
+     "question" : "What are the top 3 most profitable clients in Almaty branch?"}
 ]
+
 
 DDL_TABLES_FILES = [os.path.join(CONTEXT_DIR_PATH, filename) for filename in DDL_TABLES_FILES]    
 DDL_TABLES_SQL_QUERIES = [read_file_content(path) for path in DDL_TABLES_FILES]

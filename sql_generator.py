@@ -17,7 +17,7 @@ SQL_GENERATOR_PROMT = PromptTemplate(template="""
     You are an expert analyst that transforms bussines questions into
     SQL queries and answer thee questions using data-driven approach.
     Our company is based on logistics and transportation. Your goal is to generate SQL query (postgres)
-    to answer user's question.
+    to answer user's question. Make sure to use postgres dialect of SQL!
                                      
     Answer this question using provided information: {question}
     
@@ -61,6 +61,7 @@ RESULT_INTERPRETER_PROMT = PromptTemplate.from_template("""
 class SQLGeneratorState(TypedDict):
     question : Required[str]
     session_id : Required[str] #need for memory
+    error_trace : str
     generated_sql : str
     retrieval_response : dict
     postgres_executor_response : dict
@@ -140,9 +141,11 @@ class SQLGenerator():
 
     def format_question_retry(self, question, generated_sql, trace):
 
-        updated_question = f"""Your goal was to answer this question using SQL: {question}
+        updated_question = f"""\n[INFO FROM PREVIOUS CALL]\n
+                        Your goal was to answer this question using SQL: {question}
                         and you produced the following SQL: {generated_sql}
-        Database returned the following traceback on error {trace}. Please, fix your SQL query"""
+                        Database returned the following traceback on error {trace}. 
+                        Please, fix your SQL query"""
 
         return updated_question
     
@@ -162,6 +165,14 @@ class SQLGenerator():
     def _generate_sql(self, state : SQLGeneratorState):
 
         question = state["question"]
+        new_state = state
+        #atach previous error trace if it is not 1st trial
+        if state["error_trace"]:
+            question = self.format_question_retry(question, 
+                                                  state["generated_sql"],
+                                                state["error_trace"])
+            new_state["n_retries"] += 1
+            
         retrieval_response = state["retrieval_response"]
 
         current_time = datetime.now(AMLATY_TZ).strftime('%Y-%m-%d-%H-%M')
@@ -183,7 +194,7 @@ class SQLGenerator():
         logging.info("Extracting SQL from llm response")
         llm_sql_generated = self.extract_sql(llm_response)
 
-        new_state = state
+        
         new_state["generated_sql"] = llm_sql_generated
         return new_state
         
@@ -207,12 +218,8 @@ class SQLGenerator():
              or (state["postgres_executor_response"]["any_errors"] == True)):
             
             error_trace = new_state["postgres_executor_response"]["error_trace"]
-            new_state["n_retries"] += 1
-            new_state["question"] = self.format_question_retry(state["question"],
-                                                                state["generated_sql"],
-                                                                error_trace)
+            new_state["error_trace"] = error_trace
 
-            #new_state["question"] = new_state["question"] + f"\nPrevious time your query produced the following error: {error_trace}\n. Fix it please"
             logging.error(f"Detected error; Need to RETRY...")
 
         return new_state
@@ -236,7 +243,8 @@ class SQLGenerator():
         if ((state["postgres_executor_response"]["is_query_safe"] == False)
              or (state["postgres_executor_response"]["any_errors"] == True)):
             new_state = state
-            new_state["final_answer"] = "After several retries, some error still persists when trying to run SQL query.\n Sorry for inconvinience"
+            error_trace = state["error_trace"]
+            new_state["final_answer"] = f"After several retries, some error still persists when trying to run SQL query.\n Sorry for inconvinience.\nError Trace: {error_trace}"
 
             #clean them for better readability (they saved anyway)
             new_state["postgres_executor_response"] = None
@@ -244,6 +252,7 @@ class SQLGenerator():
             return new_state
         
         new_state = state
+        new_state["error_trace"] = None
 
         current_time = datetime.now(AMLATY_TZ).strftime('%Y-%m-%d-%H-%M')
 
