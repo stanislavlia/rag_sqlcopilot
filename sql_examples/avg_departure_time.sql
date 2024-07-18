@@ -1,4 +1,4 @@
-
+-- What is the average departure time?
 -- Average courier departure time.
 -- To find out average first departure time for drivers,
 -- you can stick to this particular SQL query:

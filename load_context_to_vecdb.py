@@ -25,6 +25,7 @@ def add_comment_doc(doc_content, comment):
 
 
 CONTEXT_DIR_PATH = "tables_info/"
+SQL_EXAMPLES_DIR = "sql_examples/"
 
 DDL_TABLES_FILES = [
     "applicationgoods.txt",
