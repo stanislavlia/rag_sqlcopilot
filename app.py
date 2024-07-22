@@ -6,7 +6,6 @@ from retrieval_graph import RetrievalManager
 from postgres_executor_graph import PostgresExecutor
 from langchain_openai import ChatOpenAI
 from sql_generator import SQLGenerator
-import chromadb
 import os
 from dotenv import load_dotenv
 from pprint import pprint
@@ -42,6 +41,8 @@ CHROMA_DB_HOST="localhost"
 CHROMA_DB_PORT=8000
 OPENAI_EMBEDDING_FUNC = OpenAIEmbeddings(model="text-embedding-ada-002",
                                         api_key=OPENAI_API_KEY)
+CHROMA_DIR = "./chroma"
+
 
 ##=========Init components==========================
 llm = ChatOpenAI(model=MODEL_NAME,
@@ -53,27 +54,26 @@ llm = ChatOpenAI(model=MODEL_NAME,
 
 #=================CONNECT TO CHROMA DB=======================
 
-chromadb_client = chromadb.PersistentClient(path="./chroma")
 
 logging.info("Connected to Chroma sucessfully")
 
 
 
 #==================CREATE COLLECTIONS===========================
-ddl_vecstore = Chroma(client=chromadb_client,
+ddl_vecstore = Chroma( persist_directory=CHROMA_DIR,
                           collection_name="ddl_statements",
                           embedding_function=OPENAI_EMBEDDING_FUNC,
-                          persist_directory=None)
+                          )
     
-sqlexamples_vecstore = Chroma(client=chromadb_client,
+sqlexamples_vecstore = Chroma(persist_directory=CHROMA_DIR,
                           collection_name="sql_examples",
                           embedding_function=OPENAI_EMBEDDING_FUNC,
-                          persist_directory=None)
+                          )
     
-doc_vecstore = Chroma(client=chromadb_client,
+doc_vecstore = Chroma(persist_directory=CHROMA_DIR,
                           collection_name="docs",
                           embedding_function=OPENAI_EMBEDDING_FUNC,
-                          persist_directory=None)
+                         )
 
 
 #==================INIT WORKFLOWS====================================
@@ -123,3 +123,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="localhost", port=8012)

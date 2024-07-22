@@ -3,4 +3,8 @@ version: '3.3'
 services:
   relog_copilot:
     image: rag_copilot
+    env_file:
+      - ./.env
+    ports:
+      - "8012:8012"
 

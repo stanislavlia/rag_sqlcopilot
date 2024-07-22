@@ -6,7 +6,6 @@ from retrieval_graph import RetrievalManager
 from postgres_executor_graph import PostgresExecutor
 from langchain_openai import ChatOpenAI
 from sql_generator import SQLGenerator
-import chromadb
 import os
 from dotenv import load_dotenv
 from pprint import pprint
@@ -37,6 +36,7 @@ CHROMA_DB_PORT=8000
 OPENAI_EMBEDDING_FUNC = OpenAIEmbeddings(model="text-embedding-ada-002",
                                         api_key=OPENAI_API_KEY)
 
+
 llm = ChatOpenAI(model=MODEL_NAME,
              temperature=0,
              verbose=True,
@@ -45,7 +45,7 @@ llm = ChatOpenAI(model=MODEL_NAME,
              )
 
 #Connect to Chroma
-chromadb_client = chromadb.HttpClient(host=CHROMA_DB_HOST,
+chromadb_client = HttpClient(host=CHROMA_DB_HOST,
                                           port=CHROMA_DB_PORT)
 
 logging.info("Connected to Chroma sucessfully")

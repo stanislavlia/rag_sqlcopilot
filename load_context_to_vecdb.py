@@ -1,7 +1,7 @@
 from langchain_community.vectorstores import Chroma
 from pprint import pprint
 import os
-import chromadb
+
 from langchain.evaluation import EmbeddingDistance
 from langchain.evaluation import load_evaluator
 import logging
@@ -26,7 +26,7 @@ def add_comment_doc(doc_content, comment):
 
 
 
-
+CHROMA_DIR = "./chroma"
 CONTEXT_DIR_PATH = "tables_info/"
 SQL_EXAMPLES_DIR = "sql_examples/"
 DOMAIN_CONTEXT_DIR = "domain_context/"
@@ -60,27 +60,25 @@ TRAIN_SQL_EXAMPLES = [read_file_content(os.path.join(SQL_EXAMPLES_DIR, file))
 
 if __name__ == "__main__":
 
-    chromadb_client = chromadb.PersistentClient(path="./chroma")
-
 
     OPENAI_EMBEDDING_FUNC = OpenAIEmbeddings(model="text-embedding-ada-002",
                                         api_key=OPENAI_API_KEY)
 
 
-    ddl_vecstore = Chroma(client=chromadb_client,
+    ddl_vecstore = Chroma(persist_directory=CHROMA_DIR  ,
                           collection_name="ddl_statements",
                           embedding_function=OPENAI_EMBEDDING_FUNC,
-                          persist_directory=None)
+                        persist_directory=None)
     
-    sqlexamples_vecstore = Chroma(client=chromadb_client,
+    sqlexamples_vecstore = Chroma(persist_directory=CHROMA_DIR ,
                             collection_name="sql_examples",
                             embedding_function=OPENAI_EMBEDDING_FUNC,
-                            persist_directory=None)
+                            )
         
-    doc_vecstore = Chroma(client=chromadb_client,
+    doc_vecstore = Chroma(persist_directory=CHROMA_DIR,
                             collection_name="docs",
                             embedding_function=OPENAI_EMBEDDING_FUNC,
-                            persist_directory=None)
+                            )
 
 
     #load docs to collections
