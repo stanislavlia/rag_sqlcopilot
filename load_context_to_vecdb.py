@@ -4,10 +4,13 @@ import os
 import chromadb
 from langchain.evaluation import EmbeddingDistance
 from langchain.evaluation import load_evaluator
-from copilot_base import ddl_vecstore, sqlexamples_vecstore, doc_vecstore
 import logging
 from retrieval_graph import check_if_duplicate
+from dotenv import load_dotenv
+from langchain_openai import OpenAIEmbeddings
 
+
+load_dotenv()
 
 
     
@@ -27,6 +30,8 @@ def add_comment_doc(doc_content, comment):
 CONTEXT_DIR_PATH = "tables_info/"
 SQL_EXAMPLES_DIR = "sql_examples/"
 DOMAIN_CONTEXT_DIR = "domain_context/"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
 
 DDL_TABLES_FILES = [
     "applicationgoods.txt",
@@ -54,6 +59,28 @@ TRAIN_SQL_EXAMPLES = [read_file_content(os.path.join(SQL_EXAMPLES_DIR, file))
 
 
 if __name__ == "__main__":
+
+    chromadb_client = chromadb.PersistentClient(path="./chroma")
+
+
+    OPENAI_EMBEDDING_FUNC = OpenAIEmbeddings(model="text-embedding-ada-002",
+                                        api_key=OPENAI_API_KEY)
+
+
+    ddl_vecstore = Chroma(client=chromadb_client,
+                          collection_name="ddl_statements",
+                          embedding_function=OPENAI_EMBEDDING_FUNC,
+                          persist_directory=None)
+    
+    sqlexamples_vecstore = Chroma(client=chromadb_client,
+                            collection_name="sql_examples",
+                            embedding_function=OPENAI_EMBEDDING_FUNC,
+                            persist_directory=None)
+        
+    doc_vecstore = Chroma(client=chromadb_client,
+                            collection_name="docs",
+                            embedding_function=OPENAI_EMBEDDING_FUNC,
+                            persist_directory=None)
 
 
     #load docs to collections

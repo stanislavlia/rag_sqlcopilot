@@ -52,8 +52,8 @@ llm = ChatOpenAI(model=MODEL_NAME,
              )
 
 #=================CONNECT TO CHROMA DB=======================
-chromadb_client = chromadb.HttpClient(host=CHROMA_DB_HOST,
-                                          port=CHROMA_DB_PORT)
+
+chromadb_client = chromadb.PersistentClient(path="./chroma")
 
 logging.info("Connected to Chroma sucessfully")
 
