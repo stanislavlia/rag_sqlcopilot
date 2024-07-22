@@ -5,8 +5,15 @@ from langchain_community.vectorstores import VectorStore
 from langchain_core.documents import Document
 
 import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
 
-DUP_TRESHOLD=0.99
+DUP_TRESHOLD=0.9999
 
 def check_if_duplicate(collection, doc_content):
 
