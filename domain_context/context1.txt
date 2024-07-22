@@ -7,6 +7,8 @@ You will have to answer analytical questions related to data about transportatio
 Here's some domain knowledge of logistics analysis and guide how to answer some questions.
 
 
+
+
 Client's priority/profitablity
    The most priority client is one who has applications 
    in total on the largest sum of money.(see generalprice field in application table)

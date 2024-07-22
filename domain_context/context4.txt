@@ -21,3 +21,7 @@ All branches/departments. Все филиалы в нашей компании
 "Филиал RG BRANDS в г. Туркестан"
 "Филиал RG BRANDS в г. Шымкент"
    
+Whenever you are asked to count how many drivers
+work in a certain branch or in total, make sure to check
+that drivers you count have status 'Online'
+(couriers.status = 'Online')

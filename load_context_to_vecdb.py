@@ -68,7 +68,7 @@ if __name__ == "__main__":
     ddl_vecstore = Chroma(persist_directory=CHROMA_DIR  ,
                           collection_name="ddl_statements",
                           embedding_function=OPENAI_EMBEDDING_FUNC,
-                        persist_directory=None)
+                        )
     
     sqlexamples_vecstore = Chroma(persist_directory=CHROMA_DIR ,
                             collection_name="sql_examples",
