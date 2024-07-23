@@ -74,7 +74,7 @@ class RetrievalManager():
         
         question = state['question']
 
-        retrieved_ddls = self.ddl_collection.similarity_search(query=question,
+        retrieved_ddls = self.ddl_collection.max_marginal_relevance_search(query=question,
                                                                k=self.k_ddl)
         
         new_state = state

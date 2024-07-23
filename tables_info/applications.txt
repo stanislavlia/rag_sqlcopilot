@@ -1,6 +1,9 @@
 -- This table is probably the most important one as it captures all needed 
 -- information about completed orders/applications, about driver's efficiency
 -- and the revenue of company
+-- Example of questions: What are top 3 most efficient drivers
+-- What are the most important clients by amount of money spent?
+-- How many applications have we finished in July?
 
 CREATE TABLE copilot2.applications (
 	_id TEXT, 

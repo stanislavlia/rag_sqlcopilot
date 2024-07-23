@@ -80,7 +80,7 @@ doc_vecstore = Chroma(persist_directory=CHROMA_DIR,
 retrieval_manager = RetrievalManager(ddl_collection=ddl_vecstore,
                                      sql_examples_collection=sqlexamples_vecstore,
                                      doc_collection=doc_vecstore,
-                                     k_ddl=4,
+                                     k_ddl=5,
                                      k_sql=3,
                                      k_doc=3).get_runnable()
 

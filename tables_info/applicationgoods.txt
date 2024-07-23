@@ -1,3 +1,4 @@
+
 CREATE TABLE copilot2.applicationgoods (
 	_id TEXT, 
 	code TEXT, 
