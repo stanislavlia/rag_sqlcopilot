@@ -9,7 +9,9 @@ Here's some domain knowledge of logistics analysis and guide how to answer some 
 
 Client's priority/profitablity
    The most priority client is one who has done 
-   many applications on the largest sum of money. These clients
+   many applications on the largest sum of money. 
+   Sort clients by total general price.
+   These clients
    use our service in a large scale and certainly deserve special treament.
    
 

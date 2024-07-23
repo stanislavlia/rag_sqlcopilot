@@ -8,7 +8,6 @@ import sqlparse
 import psycopg2
 from psycopg2 import pool
 
-
 ##=======QUERY EXECUTOR GRAPH STATE===============
 class SQLExecutorGraphState(TypedDict):
     sql_query: Required[str]
@@ -121,8 +120,6 @@ class PostgresExecutor():
                 new_state["sql_result_markdown"] = sql_result_markdown
                 logging.info(f"[PostgresExecutor] Successfully executed query")
 
-                return new_state
-
         except psycopg2.Error as e:
             logging.error(f"[PostgresExecutor] Error executing query: {e}")
             new_state["any_errors"] = True
@@ -130,11 +127,18 @@ class PostgresExecutor():
             new_state["sql_result"] = None
             new_state["sql_result_markdown"] = None
 
-            return new_state
+            # Rollback the transaction in case of error, if connection is still open
+            if connection and not connection.closed:
+                try:
+                    connection.rollback()
+                except psycopg2.InterfaceError as rollback_error:
+                    logging.error(f"[PostgresExecutor] Rollback error: {rollback_error}")
 
         finally:
             if connection:
                 self.db_pool.putconn(connection)
+
+        return new_state
 
     def __build_graph(self):
         workflow = StateGraph(SQLExecutorGraphState)
