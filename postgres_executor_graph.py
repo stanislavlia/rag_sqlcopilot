@@ -1,4 +1,4 @@
-from typing_extensions import TypedDict, List, Optional, Required
+from typing_extensions import TypedDict, List, Required
 from langchain_core.runnables.base import RunnableSequence
 from langgraph.graph import END, StateGraph
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
@@ -6,31 +6,29 @@ import logging
 import pandas as pd
 import sqlparse
 import psycopg2
+from psycopg2 import pool
 
 
 ##=======QUERY EXECUTOR GRAPH STATE===============
 class SQLExecutorGraphState(TypedDict):
-    sql_query : Required[str]
-    sql_result : List
-    sql_result_markdown : str
-    is_query_safe : bool
-    any_errors : bool
-    error_trace : str
-
-#TODO: Fix checking for READ-only access using vanna funciton
+    sql_query: Required[str]
+    sql_result: List
+    sql_result_markdown: str
+    is_query_safe: bool
+    any_errors: bool
+    error_trace: str
 
 class PostgresExecutor():
     """Langraph workflow that executes provided SQL query on PostgreSQL"""
 
     def __init__(self,
-                 pg_database : str,
-                 pg_user : str,
-                 pg_password : str,
-                 pg_host : str,
-                 pg_port : str,
-                 pg_schema : str,
-                 limit_rows=30
-                 ):
+                 pg_database: str,
+                 pg_user: str,
+                 pg_password: str,
+                 pg_host: str,
+                 pg_port: str,
+                 pg_schema: str,
+                 limit_rows=30):
         
         self.pg_database = pg_database
         self.pg_user = pg_user
@@ -40,21 +38,21 @@ class PostgresExecutor():
         self.pg_schema = pg_schema
         self.limit_rows = limit_rows
 
-        self.db_connection = self.__connect_to_db()
+        self.db_pool = pool.SimpleConnectionPool(
+            1, 10,  # Minimum and maximum number of connections
+            database=self.pg_database,
+            user=self.pg_user,
+            password=self.pg_password,
+            host=self.pg_host,
+            port=self.pg_port
+        )
 
         self.graph_workflow = self.__build_graph()
-        
+
     def __connect_to_db(self):
         try:
-            connection = psycopg2.connect(
-                database=self.pg_database,
-                user=self.pg_user,
-                password=self.pg_password,
-                host=self.pg_host,
-                port=self.pg_port
-            )
-            
-            logging.info(f"[PostgresExecutor] Sucessfully connected")
+            connection = self.db_pool.getconn()
+            logging.info(f"[PostgresExecutor] Successfully connected")
             return connection
         except psycopg2.OperationalError as e:
             logging.error(f"[PostgresExecutor] OperationalError: {e}")
@@ -62,26 +60,21 @@ class PostgresExecutor():
         except psycopg2.Error as e:
             logging.error(f"[PostgresExecutor] Error: {e}")
             return None
-    
-    def sql_result_to_markdown(self, sql_result, column_names):
 
+    def sql_result_to_markdown(self, sql_result, column_names):
         df = pd.DataFrame(sql_result)
         df.columns = column_names
-
         return df.to_markdown()
 
     def is_sql_valid(self, sql):
         parsed = sqlparse.parse(sql)
-
         for statement in parsed:
             if statement.get_type() == 'SELECT':
                 return True
-
         return False
 
     def _sanitize_query(self, state: SQLExecutorGraphState):
         sql_query = state["sql_query"].upper()
-
         new_state = state
 
         if not self.is_sql_valid(sql_query):
@@ -89,73 +82,70 @@ class PostgresExecutor():
             new_state["any_errors"] = True
             new_state["error_trace"] = "The query is unsafe and tries to ALTER database. READ-ONLY mode is only acceptable"
             logging.warn(f"[PostgresExecutor] Detected UNSAFE query")
-
-            return state
+            return new_state
         else:
             new_state["is_query_safe"] = True
             new_state["any_errors"] = False
             logging.info(f"[PostgresExecutor] query is SAFE")
-            
-            return state
+            return new_state
 
-    def _decide_to_execute_query(self, state : SQLExecutorGraphState):
+    def _decide_to_execute_query(self, state: SQLExecutorGraphState):
         if state["is_query_safe"]:
             return "execute_query"
         return "END"
-        
 
-    def _execute_query(self, state : SQLExecutorGraphState):
-
+    def _execute_query(self, state: SQLExecutorGraphState):
         sql_query = state["sql_query"]
-        
+        connection = None
+        new_state = state
+
         try:
-            self.db_connection = self.__connect_to_db()
-            cursor = self.db_connection.cursor()
-            cursor.execute(sql_query)
-            self.db_connection.commit()
+            # Get a connection from the pool
+            connection = self.__connect_to_db()
+            if connection is None:
+                raise psycopg2.OperationalError("Unable to connect to the database.")
 
-            sql_result = cursor.fetchmany(size=self.limit_rows)
-            column_names = [desc[0] for desc in cursor.description]
-            if (len(sql_result)):
-                sql_result_markdown = self.sql_result_to_markdown(sql_result, column_names)
-            else:
-                sql_result_markdown = "Empty"
+            with connection.cursor() as cursor:
+                cursor.execute("SET TRANSACTION READ ONLY;")
+                cursor.execute(sql_query)
 
-            new_state = state
-            new_state["any_errors"] = False
-            new_state["sql_result"] = sql_result
-            new_state["sql_result_markdown"] = sql_result_markdown
-            logging.info(f"[PostgresExecutor] Sucessfully executed query")
+                sql_result = cursor.fetchmany(size=self.limit_rows)
+                column_names = [desc[0] for desc in cursor.description]
+                if sql_result:
+                    sql_result_markdown = self.sql_result_to_markdown(sql_result, column_names)
+                else:
+                    sql_result_markdown = "Empty"
 
-            return new_state
-        
+                new_state["any_errors"] = False
+                new_state["sql_result"] = sql_result
+                new_state["sql_result_markdown"] = sql_result_markdown
+                logging.info(f"[PostgresExecutor] Successfully executed query")
+
+                return new_state
+
         except psycopg2.Error as e:
             logging.error(f"[PostgresExecutor] Error executing query: {e}")
-            new_state = state
             new_state["any_errors"] = True
             new_state["error_trace"] = str(e)
             new_state["sql_result"] = None
             new_state["sql_result_markdown"] = None
 
             return new_state
-        
-        finally:
-            if cursor:
-                cursor.close()
 
+        finally:
+            if connection:
+                self.db_pool.putconn(connection)
 
     def __build_graph(self):
-
         workflow = StateGraph(SQLExecutorGraphState)
-
         workflow.add_node("sanitize_query", self._sanitize_query)
         workflow.add_node("execute_query", self._execute_query)
 
         workflow.set_entry_point("sanitize_query")
         workflow.add_conditional_edges("sanitize_query",
                                        self._decide_to_execute_query,
-                                       path_map={"execute_query" : "execute_query",
-                                                 "END" : END})
+                                       path_map={"execute_query": "execute_query",
+                                                 "END": END})
         
         workflow.add_edge("execute_query", END)
 
@@ -164,10 +154,4 @@ class PostgresExecutor():
         return graph
 
     def get_runnable(self) -> RunnableSequence:
-
         return self.graph_workflow
-
-    
-    
-    
-
