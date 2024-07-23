@@ -1,0 +1,4 @@
+The only criteria to identify which client 
+is more important - compare amount of money the client
+spent using our service. You should look at applications table
+and compute total sum of generalprice field.

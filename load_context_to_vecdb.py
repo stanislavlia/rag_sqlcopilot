@@ -36,7 +36,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 DDL_TABLES_FILES = [
     "applicationgoods.txt",
     "applications.txt",
-    "apporders.txt",
+    #"apporders.txt",
     "clients.txt",
     "companies.txt",
     "couriers.txt",
