@@ -13,7 +13,7 @@ logging.basicConfig(
     ]
 )
 
-DUP_TRESHOLD=0.9999
+DUP_TRESHOLD=0.99999
 
 def check_if_duplicate(collection, doc_content):
 

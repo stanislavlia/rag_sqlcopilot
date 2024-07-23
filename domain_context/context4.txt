@@ -25,3 +25,6 @@ Whenever you are asked to count how many drivers
 work in a certain branch or in total, make sure to check
 that drivers you count have status 'Online'
 (couriers.status = 'Online')
+
+By default, execute query ONLY on a recent year to make sure
+we analyze data that is up-to-date.
